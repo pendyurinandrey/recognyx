@@ -20,7 +20,7 @@ MPS совпадает, отличается только скорость (MPS 
 torch и pyannote импортируются только внутри run().
 
 Использование:
-    ./venv/bin/python -m diarization.diarize_pyannote recording.wav --output recording.diarization.json
+    uv run python -m diarization.diarize_pyannote recording.wav --output recording.diarization.json
 """
 
 import argparse

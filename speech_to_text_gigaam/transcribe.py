@@ -54,7 +54,7 @@ def words_path(transcript_path) -> Path:
 def _run_module(module: str, args: list, log) -> None:
     """Запускает `python -m module ...`, построчно передаёт вывод в log().
     Бросает RuntimeError с хвостом вывода, если процесс завершился с ошибкой."""
-    # Корень репозитория — в PYTHONPATH: editable-установка (pip install -e .)
+    # Корень репозитория — в PYTHONPATH: editable-установка (uv sync)
     # запоминает список пакетов на момент установки и не видит добавленных позже.
     python_path = os.pathsep.join(filter(None, [str(REPO_ROOT), os.environ.get("PYTHONPATH")]))
     env = dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8", TQDM_DISABLE="1",

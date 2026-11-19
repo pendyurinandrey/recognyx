@@ -10,10 +10,8 @@ fork-join (обязательный шаг) + speech-to-text через GigaAM-v
 окнами/модальностью, что должно снять эту категорию проблем.
 
 Использование:
-    python3 -m venv venv && source venv/bin/activate
-    pip install -r requirements.txt
-    pip install -e .
-    python3 pipeline_ui.py
+    uv sync && source .venv/bin/activate
+    python pipeline_ui.py
 """
 
 import json

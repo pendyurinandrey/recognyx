@@ -18,18 +18,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      # uv сам скачивает нужный Python (поверх .python-version из репозитория)
+      - uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Только pytest (см. [project.optional-dependencies] в pyproject.toml): тяжёлые
-      # зависимости — GigaAM, torch, PySide6 — не ставятся, тестам они не нужны.
+      # Только группа dev (pytest), без самого проекта и его зависимостей: тяжёлые
+      # GigaAM, torch, PySide6 тестам не нужны. Пакеты проекта импортируются через
+      # pythonpath = ["."] в настройках pytest. --locked: uv.lock должен быть актуален.
       - name: Install
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -e ".[dev]"
+        run: uv sync --locked --only-group dev
 
       # -rs печатает причины пропущенных тестов. Пропусков быть не должно: тестам не нужны
       # ни gigaam, ни torch (тяжёлые импорты — только внутри функций процессов-исполнителей).
       - name: Run tests
-        run: python -m pytest -rs
+        run: uv run --no-sync python -m pytest -rs

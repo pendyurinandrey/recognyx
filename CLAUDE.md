@@ -55,11 +55,15 @@ GUI-процесс (`pipeline_ui.py`) не считает и не держит �
 - **macOS и `DYLD_*`.** Системные утилиты (`nohup` и др. из `/usr/bin`) вычищают `DYLD_FALLBACK_LIBRARY_PATH`.
   Для фонового запуска использовать `subprocess.Popen(..., start_new_session=True, env=...)`, не `nohup`.
   Переменная нужна, когда системный ffmpeg версии 9+ (torchcodec поддерживает 4–8), см. FAQ в README.
-- **Editable-установка.** `pip install -e .` запоминает список пакетов на момент установки; новый
-  пакет нужно добавить в `include` в `pyproject.toml` и переустановить. Дочерние процессы получают
+- **Зависимости — через uv.** Список — в `pyproject.toml` (`dependencies`, группа `dev`), точные версии —
+  в `uv.lock` (коммитится), версия Python — в `.python-version`. Добавлять через `uv add`, не `pip install`;
+  `requirements.txt` есть только у `speech_to_text_whisper`. `requires-python` ограничен `<3.14`:
+  gigaam требует onnxruntime 1.23, у которого нет сборок под 3.14.
+- **Editable-установка.** `uv sync` ставит проект editable и запоминает список пакетов на момент
+  установки; новый пакет нужно добавить в `include` в `pyproject.toml` и выполнить `uv sync --reinstall-package recognyx`. Дочерние процессы получают
   корень репозитория в `PYTHONPATH` (`_run_module`), поэтому запуск из любой папки работает.
-- **Два venv.** `speech_to_text_whisper` и GigaAM требуют несовместимые версии `torch`;
-  `pipeline_ui` работает в корневом venv только с GigaAM.
+- **Два окружения.** `speech_to_text_whisper` и GigaAM требуют несовместимые версии `torch`;
+  `pipeline_ui` работает в корневом `.venv` только с GigaAM, whisper — в `speech_to_text_whisper/venv`.
 - **Gated-модели Hugging Face.** Новую модель с условиями использования проверять в кэше ДО долгой
   работы (`check_model_available`, `local_files_only=True`) и выдавать инструкцию; описать в FAQ README.
 - **Долгие прогоны.** Полная обработка многочасовой записи (диаризация + GigaAM) занимает больше
@@ -68,19 +72,19 @@ GUI-процесс (`pipeline_ui.py`) не считает и не держит �
 ## Тесты
 
 ```shell
-pip3 install -e ".[dev]"
-python3 -m pytest
+uv sync
+uv run python -m pytest
 ```
 
-Перед завершением работы запускать `python3 -m pytest` (не голый `pytest`: он может взяться из системного
-Python без GigaAM, и часть тестов молча пропустится) — из активированного venv или как `./venv/bin/python -m pytest`. Тесты покрывают чистую логику и не требуют
+Перед завершением работы запускать `uv run python -m pytest` (не голый `pytest`: он может взяться из системного
+Python без GigaAM, и часть тестов молча пропустится). Тесты покрывают чистую логику и не требуют
 медиафайлов, ffmpeg и нейросетей (обёртки ffmpeg проверяются с подменой `subprocess.run`).
 Дерево тестов повторяет дерево кода: `tests/<пакет>/test_<модуль>.py`
 (например, `common/ffmpeg.py` → `tests/common/test_ffmpeg.py`). `__init__.py` в `tests/` не нужны:
 в `pyproject.toml` включён `--import-mode=importlib`, поэтому одинаковые имена файлов в разных
 папках допустимы, а `tests/common` не затеняет пакет `common`.
-CI: `.github/workflows/tests.yml` гоняет `pytest` на каждый push (Python 3.10 и 3.12), ставится только
-`pytest` — без GigaAM/torch. Пропущенных (`skipped`) тестов быть не должно: если тест требует тяжёлую
+CI: `.github/workflows/tests.yml` гоняет `pytest` на каждый push (Python 3.10 и 3.12) через uv, ставится только
+группа `dev` (`uv sync --only-group dev`) — без GigaAM/torch. Пропущенных (`skipped`) тестов быть не должно: если тест требует тяжёлую
 зависимость, значит, тяжёлый импорт оказался не там (см. раздел выше).
 Qt-диалоги в CI не тестируются (там нет PySide6), поэтому всё, что можно проверить без Qt, выносить в чистые
 модули с тестами: правила выбора файлов — `ui/media_selection.py`, правка границ фрагментов —

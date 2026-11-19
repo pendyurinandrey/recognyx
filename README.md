@@ -12,14 +12,12 @@
 
 ### Что нужно сделать перед первым запуском
 
-* Проверить, что на компьютере установлен Python 3 (тестирование проводилось на версии 3.10)
-* Создать Virtual Environment и установить зависимости
+* Установить [uv](https://docs.astral.sh/uv/getting-started/installation/) — менеджер пакетов и версий Python (macOS: `brew install uv`). Отдельно ставить Python не нужно: uv сам скачает версию из файла `.python-version` (сейчас 3.12; поддерживаются 3.10–3.13, на 3.14 GigaAM не устанавливается)
+* Создать виртуальное окружение `.venv` и установить зависимости (точные версии зафиксированы в `uv.lock`):
 
 ```shell
-python3 -m venv venv
-source venv/bin/activate
-pip3 install -r requirements.txt
-pip3 install -e .
+uv sync
+source .venv/bin/activate
 ```
 
 * Проверить, что локально установлен `ffmpeg`. Версия должна быть между `4.х.х` и `8.x.x` включительно. См. [Что делать если у меня ffmpeg 9?](#что-делать-если-версия-ffmpeg-9), если установлена версия новее
@@ -162,15 +160,17 @@ CPU, beam search + VAD) и последующее восстановление �
 (`kontur-ai/sbert_punc_case_ru`) с удалением слов-паразитов. Модели скачиваются
 один раз и кэшируются в `~/.cache/huggingface/hub`.
 
-#### Установка (отдельная от корневого `requirements.txt`)
+#### Установка (отдельная от основного окружения `.venv`)
 
 ```bash
 cd speech_to_text_whisper
-python3 -m venv venv
-./venv/bin/pip install -r requirements.txt
+uv venv --python 3.12 venv
+uv pip install --python venv -r requirements.txt
 cd ..
-./speech_to_text_whisper/venv/bin/pip install -e .
+uv pip install --python speech_to_text_whisper/venv --no-deps -e .
 ```
+
+`--no-deps` обязателен: иначе вместе с проектом в это окружение поставятся его зависимости (GigaAM со своим `torch`).
 
 Своя отдельная виртуальная среда нужна из-за несовместимой версии `torch`
 (см. [Какой движок распознавания речи выбрать](#какой-движок-распознавания-речи-выбрать) ниже).
@@ -232,7 +232,7 @@ python3 -m speech_to_text_whisper.restore_punctuation lecture.json
 
 #### Что нужно
 
-GigaAM работает внутри `pipeline_ui.py` и ставится вместе с ним в корневую venv (`requirements.txt`, см. выше). Отдельного запуска из командной строки у пакета нет. Дополнительно нужны (проверяются автоматически при запуске):
+GigaAM работает внутри `pipeline_ui.py` и ставится вместе с ним в основное окружение `.venv` (`uv sync`, см. выше). Отдельного запуска из командной строки у пакета нет. Дополнительно нужны (проверяются автоматически при запуске):
 
 - **Аккаунт Hugging Face + токен** (бесплатно) — см. [Как получить и установить Hugging Face токен?](#как-получить-и-установить-hugging-face-токен)
 - **ffmpeg версии 4-8** — если ваш системный `ffmpeg` новее, при запуске
@@ -335,7 +335,7 @@ GigaAM работает внутри `pipeline_ui.py` и ставится вме
 
 Модули **используют разные, несовместимые версии `torch`** (GigaAM тянет за
 собой более старый `torch` из-за зависимости от pyannote), поэтому объединить
-их в одну venv не получится: GigaAM работает в корневой venv вместе с
+их в одну venv не получится: GigaAM работает в основном окружении `.venv` вместе с
 `pipeline_ui.py`, а `speech_to_text_whisper` — в своей отдельной.
 
 ## Разработка
@@ -345,13 +345,15 @@ GigaAM работает внутри `pipeline_ui.py` и ставится вме
 Тесты (pytest) проверяют чистую логику — склейку слов с говорящими, интервалы фрагментов, слова-паразиты, обёртки над ffmpeg. Медиафайлы, ffmpeg и нейросети для них не нужны:
 
 ```shell
-pip3 install -e ".[dev]"
-python3 -m pytest
+uv sync
+uv run python -m pytest
 ```
 
-Команды выполняются в терминале с активированной Virtual Environment проекта. Тесты нужно запускать именно как `python3 -m pytest`, а не просто `pytest`: так берётся интерпретатор из venv, тогда как голый `pytest` может запуститься из системного Python, где нет GigaAM, — тогда часть тестов будет пропущена (`skipped`).
+`pytest` входит в группу зависимостей `dev`, которую `uv sync` ставит по умолчанию. Тесты нужно запускать именно как `python -m pytest` (через `uv run` или в активированном `.venv`), а не просто `pytest`: голый `pytest` может запуститься из системного Python, где нет GigaAM, — тогда часть тестов будет пропущена (`skipped`).
 
-При каждом `push` тесты автоматически запускает GitHub Actions ([.github/workflows/tests.yml](.github/workflows/tests.yml)) на Python 3.10 и 3.12. Результат виден на вкладке Actions репозитория. Там ставится только `pytest`, без GigaAM и `torch`: тестам они не нужны.
+Зависимости добавляются через `uv add <пакет>` (для разработки — `uv add --dev <пакет>`): команда сама допишет `pyproject.toml` и обновит `uv.lock`. Оба файла коммитятся.
+
+При каждом `push` тесты автоматически запускает GitHub Actions ([.github/workflows/tests.yml](.github/workflows/tests.yml)) на Python 3.10 и 3.12. Результат виден на вкладке Actions репозитория. Там ставится только `pytest` (`uv sync --only-group dev`), без GigaAM и `torch`: тестам они не нужны.
 
 ## FAQ
 
@@ -378,7 +380,7 @@ python3 -m pytest
 **2. Создать окружение с закреплённой версией ffmpeg**
 
 Команда одинаковая на всех ОС (выполняется в обычном терминале/PowerShell,
-не в venv проекта):
+не в `.venv` проекта):
 
 ```shell
 conda create -n ffmpeg8 -c conda-forge "ffmpeg<9" -y
@@ -393,34 +395,35 @@ conda create -n ffmpeg8 -c conda-forge "ffmpeg<9" -y
 (`<conda>` — папка, куда была установлена Miniconda, обычно
 `~/miniconda3` на macOS/Linux или `%USERPROFILE%\miniconda3` на Windows):
 
-| ОС      | Переменная                                                                                  | Путь                               | Команда (в терминале, после активации venv проекта)                                           |
+| ОС      | Переменная                                                                                  | Путь                               | Команда (в терминале, после активации `.venv` проекта)                                           |
 |---------|---------------------------------------------------------------------------------------------|------------------------------------|-----------------------------------------------------------------------------------------------|
 | macOS   | `DYLD_FALLBACK_LIBRARY_PATH`                                                                | `<conda>/envs/ffmpeg8/lib`         | `export DYLD_FALLBACK_LIBRARY_PATH="$HOME/miniconda3/envs/ffmpeg8/lib"`                       |
 | Linux   | `LD_LIBRARY_PATH`                                                                           | `<conda>/envs/ffmpeg8/lib`         | `export LD_LIBRARY_PATH="$HOME/miniconda3/envs/ffmpeg8/lib"`                                  |
 | Windows | `PATH` (отдельной переменной нет — Windows ищет библиотеки там же, где и исполняемые файлы) | `<conda>\envs\ffmpeg8\Library\bin` | PowerShell: `$env:PATH = "$env:USERPROFILE\miniconda3\envs\ffmpeg8\Library\bin;" + $env:PATH` |
 
-**4. Чтобы переменная подхватывалась автоматически при активации venv**
+**4. Чтобы переменная подхватывалась автоматически при активации `.venv`**
 
-Каждый venv, созданный командой `python3 -m venv venv`, генерирует скрипт
-активации — в него можно один раз дописать нужный `export`/`set`, и дальше
-он будет применяться автоматически при каждом `source venv/bin/activate`:
+У окружения `.venv`, которое создаёт `uv sync`, есть скрипт активации — в
+него можно один раз дописать нужный `export`/`set`, и дальше он будет
+применяться автоматически при каждом `source .venv/bin/activate`:
 
 ```shell
-# macOS — дописать в конец venv/bin/activate:
-echo 'export DYLD_FALLBACK_LIBRARY_PATH="'"$HOME"'/miniconda3/envs/ffmpeg8/lib"' >> venv/bin/activate
+# macOS — дописать в конец .venv/bin/activate:
+echo 'export DYLD_FALLBACK_LIBRARY_PATH="'"$HOME"'/miniconda3/envs/ffmpeg8/lib"' >> .venv/bin/activate
 
-# Linux — дописать в конец venv/bin/activate:
-echo 'export LD_LIBRARY_PATH="'"$HOME"'/miniconda3/envs/ffmpeg8/lib"' >> venv/bin/activate
+# Linux — дописать в конец .venv/bin/activate:
+echo 'export LD_LIBRARY_PATH="'"$HOME"'/miniconda3/envs/ffmpeg8/lib"' >> .venv/bin/activate
 ```
 
 ```powershell
-# Windows (PowerShell) — дописать в конец venv\Scripts\Activate.ps1:
-Add-Content venv\Scripts\Activate.ps1 '$env:PATH = "' + $env:USERPROFILE + '\miniconda3\envs\ffmpeg8\Library\bin;" + $env:PATH'
+# Windows (PowerShell) — дописать в конец .venv\Scripts\Activate.ps1:
+Add-Content .venv\Scripts\Activate.ps1 '$env:PATH = "' + $env:USERPROFILE + '\miniconda3\envs\ffmpeg8\Library\bin;" + $env:PATH'
 ```
 
-Важно: это дописывается в файл конкретного, уже созданного venv — если
-venv пересоздать (`rm -rf venv && python3 -m venv venv`), строку нужно
-будет добавить заново.
+Важно: `uv run` скрипт активации не выполняет, поэтому запускать
+`pipeline_ui.py` нужно из активированного `.venv`. Обычный `uv sync` этот
+файл не перезаписывает, но если окружение пересоздать (`rm -rf .venv && uv sync`
+или смена версии Python в `.python-version`), строку нужно будет добавить заново.
 
 ### Как получить и установить Hugging Face токен?
 
@@ -430,7 +433,7 @@ GigaAM использует для нарезки длинного аудио н
 1. Зарегистрироваться (бесплатно) на [huggingface.co/join](https://huggingface.co/join)
 2. Открыть страницу модели [huggingface.co/pyannote/segmentation-3.0](https://huggingface.co/pyannote/segmentation-3.0), войти под своим аккаунтом и принять условия использования (кнопка вида "Agree and access repository" на странице модели) — без этого шага скачивание модели будет падать с ошибкой доступа, даже если токен верный
 3. Создать токен: [huggingface.co/settings/tokens](https://huggingface.co/settings/tokens) → "New token" → тип **Read** достаточно → скопировать токен (он показывается только один раз)
-4. В терминале, где активирован venv проекта, выполнить `hf auth login` и вставить токен — он закэшируется локально (`~/.cache/huggingface/token`) и дальше будет подхватываться автоматически, не нужно ничего указывать в переменных окружения при каждом запуске
+4. В терминале, где активирован `.venv` проекта, выполнить `hf auth login` и вставить токен — он закэшируется локально (`~/.cache/huggingface/token`) и дальше будет подхватываться автоматически, не нужно ничего указывать в переменных окружения при каждом запуске
 5. Альтернатива шагу 4 (если не хочется полагаться на локальный кэш) — задать токен явно переменной окружения `HF_TOKEN` перед запуском
 
 ### Как подготовить модель определения говорящих?
@@ -442,7 +445,7 @@ GigaAM использует для нарезки длинного аудио н
 
 1. Выполнить [шаги 1-4 из "Как получить и установить Hugging Face токен?"](#как-получить-и-установить-hugging-face-токен), если токена ещё нет
 2. Открыть страницу [huggingface.co/pyannote/speaker-diarization-community-1](https://huggingface.co/pyannote/speaker-diarization-community-1), войти и принять условия использования
-3. В терминале с активированным venv выполнить один раз:
+3. В терминале с активированным `.venv` выполнить один раз:
 
 ```shell
 hf download pyannote/speaker-diarization-community-1
