@@ -7,7 +7,7 @@ name = "recognyx"
 version = "0.1.0"
 # Верхняя граница: gigaam требует onnxruntime 1.23, а для него нет сборок под Python 3.14
 requires-python = ">=3.12,<3.14"
-# Окружение для графического интерфейса: fork_join (stdlib) + transcription (GigaAM) и diarization
+# Окружение для графического интерфейса: editing (stdlib) + transcription (GigaAM) и diarization
 # (gigaam[longform] приносит torch и pyannote.audio) + wakepy и PySide6 для самого GUI.
 dependencies = [
     "gigaam[torch,longform]",

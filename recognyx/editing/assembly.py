@@ -51,7 +51,7 @@ PROGRESS_STEP_PERCENT = 10
 
 
 class ConfigError(ValueError):
-    """Некорректная конфигурация fork_join."""
+    """Некорректная конфигурация сборки."""
 
 
 def media_type_of(config: dict) -> str:
@@ -289,7 +289,7 @@ def process_config(config: dict, log=print) -> None:
             "Отключите «Пережать видео» или установите ffmpeg с поддержкой x264 (например, brew install ffmpeg)."
         )
 
-    with tempfile.TemporaryDirectory(prefix="fork_join_") as tmp_dir:
+    with tempfile.TemporaryDirectory(prefix="recognyx_assembly_") as tmp_dir:
         log("Нарезаю и склеиваю фрагменты...")
         if media_type == "audio":
             join_fragments(config["segments"], tmp_dir, audio_path, "audio", log=log)

@@ -1,6 +1,6 @@
 """
 Главное окно графического интерфейса — полный конвейер обработки записи:
-fork-join (обязательный шаг) + speech-to-text через GigaAM-v3 (опциональный).
+нарезка и склейка (обязательный шаг) + распознавание речи через GigaAM-v3 (опциональный).
 
 Реализовано на PySide6 (Qt) — до этого использовался Tkinter, но его
 управление окнами/фокусом на macOS регулярно приводило к тому, что клики по
@@ -44,7 +44,7 @@ from PySide6.QtWidgets import (
 from recognyx.common import ffmpeg
 from recognyx.common.timecode import format_duration, hhmmss_to_seconds
 from recognyx.diarization import diarize_pyannote
-from recognyx.fork_join import fork_join
+from recognyx.editing import assembly
 from recognyx.ui import media_selection
 from recognyx.ui.batch_dialog import BatchDialog
 from recognyx.ui.fragments_player import FragmentsPlayerDialog
@@ -216,7 +216,7 @@ class MainWindow(QWidget):
         tree_buttons.addStretch()
         layout.addLayout(tree_buttons)
 
-        output_group = QGroupBox("Результат fork-join")
+        output_group = QGroupBox("Результат нарезки и склейки")
         output_layout = QGridLayout(output_group)
 
         self.video_label = QLabel("Видео (MP4):")
@@ -580,8 +580,8 @@ class MainWindow(QWidget):
     def _validated_config(self):
         config = self._build_config()
         try:
-            fork_join.validate_config(config)
-        except fork_join.ConfigError as e:
+            assembly.validate_config(config)
+        except assembly.ConfigError as e:
             QMessageBox.critical(self, "Некорректная конфигурация", str(e))
             return None
         return config
@@ -623,8 +623,8 @@ class MainWindow(QWidget):
             return
 
         try:
-            fork_join.check_segments_compatible(config)
-        except (fork_join.ConfigError, ffmpeg.FFmpegError) as e:
+            assembly.check_segments_compatible(config)
+        except (assembly.ConfigError, ffmpeg.FFmpegError) as e:
             QMessageBox.critical(self, "Файлы нельзя склеить", str(e))
             return
 
@@ -698,8 +698,8 @@ class MainWindow(QWidget):
                         "обработка продолжится в обычном режиме.")
 
                 t0 = time.time()
-                fork_join.process_config(config, log=log)
-                log(f"Fork/Join завершён за {format_duration(time.time() - t0)}.")
+                assembly.process_config(config, log=log)
+                log(f"Нарезка и склейка завершены за {format_duration(time.time() - t0)}.")
 
                 if run_speech2text:
                     t0 = time.time()
@@ -713,7 +713,7 @@ class MainWindow(QWidget):
                     log(f"Speech-to-text завершён за {format_duration(time.time() - t0)}.")
 
             self.done_signal.emit()
-        except (fork_join.ConfigError, ffmpeg.FFmpegError, EnvironmentCheckError,
+        except (assembly.ConfigError, ffmpeg.FFmpegError, EnvironmentCheckError,
                 diarize_pyannote.DiarizationError) as e:
             self.error_signal.emit(str(e))
         except Exception as e:  # noqa: BLE001 - показать пользователю любую неожиданную ошибку
