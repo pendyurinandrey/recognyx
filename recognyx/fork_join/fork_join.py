@@ -16,7 +16,7 @@ common/media_info.py): иначе ffmpeg склеил бы их молча и и
 Формат конфигурации: см. README.md
 
 Отдельного запуска из командной строки нет: модуль используется из
-pipeline_ui.py. Функции validate_config()/process_config() бросают
+главного окна (ui/main_window.py). Функции validate_config()/process_config() бросают
 ConfigError/FFmpegError, что позволяет UI показать ошибку пользователю.
 """
 

@@ -1,5 +1,5 @@
 """
-Графический интерфейс для полного конвейера обработки записи:
+Главное окно графического интерфейса — полный конвейер обработки записи:
 fork-join (обязательный шаг) + speech-to-text через GigaAM-v3 (опциональный).
 
 Реализовано на PySide6 (Qt) — до этого использовался Tkinter, но его
@@ -8,14 +8,11 @@ fork-join (обязательный шаг) + speech-to-text через GigaAM-v
 разработки). Qt использует собственное, значительно более зрелое управление
 окнами/модальностью, что должно снять эту категорию проблем.
 
-Запуск (из активированного .venv или через `uv run`):
-    recognyx
-    python -m recognyx
+Запускается из recognyx/__main__.py (команды `recognyx` и `python -m recognyx`).
 """
 
 import json
 import os
-import sys
 import threading
 import time
 from contextlib import nullcontext
@@ -112,7 +109,7 @@ class FragmentDialog(QDialog):
         self.accept()
 
 
-class PipelineUI(QWidget):
+class MainWindow(QWidget):
     # Сигналы для обновления UI из фонового потока — Qt автоматически
     # маршалит их на главный поток (аналог queue.Queue + polling в Tkinter,
     # но встроенный и надёжный).
@@ -733,14 +730,3 @@ class PipelineUI(QWidget):
         QMessageBox.critical(self, "Ошибка", message)
         self.progress.setRange(0, 1)
         self.run_button.setEnabled(True)
-
-
-def main():
-    app = QApplication(sys.argv)
-    window = PipelineUI()
-    window.show()
-    sys.exit(app.exec())
-
-
-if __name__ == "__main__":
-    main()
