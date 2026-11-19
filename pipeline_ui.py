@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Графический интерфейс для полного конвейера обработки лекции:
+Графический интерфейс для полного конвейера обработки записи:
 fork-join (обязательный шаг) + speech-to-text через GigaAM-v3 (опциональный).
 
 Реализовано на PySide6 (Qt) — до этого использовался Tkinter, но его
@@ -125,7 +125,7 @@ class PipelineUI(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Lecture Pipeline")
+        self.setWindowTitle("Recognyx")
 
         self.segments = []  # [{"path": str, "fragments": [{"start": str, "end": str}, ...]}]
         # MediaInfo первого файла: тип (видео/аудио) и формат всего списка; None, пока список пуст

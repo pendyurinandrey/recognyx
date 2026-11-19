@@ -248,7 +248,7 @@ class TestLogFilePath:
         from datetime import datetime
         first = tmp_path / "01.m4a"
         path = batch.log_file_path(first, when=datetime(2026, 9, 23, 14, 5, 9))
-        assert path == tmp_path / "lecture-toolkit-batch-20260923-140509.log"
+        assert path == tmp_path / "recognyx-batch-20260923-140509.log"
 
     def test_uses_the_parent_of_whatever_file_is_passed(self, tmp_path):
         other_dir = tmp_path / "elsewhere"

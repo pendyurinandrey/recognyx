@@ -1,7 +1,7 @@
 """
 Пакетная обработка: список файлов -> расшифровка для каждого, одним запуском.
 
-Для папки с независимыми лекциями — каждый файл целиком превращается в свой
+Для папки с независимыми записями — каждый файл целиком превращается в свой
 собственный транскрипт, без нарезки и склейки (`fork_join` не используется):
 `transcribe.run()` сам достаёт звук из любого файла, видео или аудио.
 
@@ -20,7 +20,7 @@ from diarization import diarize_pyannote
 from speech_to_text_gigaam import transcribe
 from speech_to_text_gigaam.environment import check_ffmpeg_compatibility, ensure_hf_token
 
-LOG_FILE_PREFIX = "lecture-toolkit-batch-"
+LOG_FILE_PREFIX = "recognyx-batch-"
 
 
 @dataclass(frozen=True)

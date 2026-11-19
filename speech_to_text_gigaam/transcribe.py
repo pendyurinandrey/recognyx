@@ -1,5 +1,5 @@
 """
-Транскрибация лекции через GigaAM-v3 и (по желанию) определение говорящих —
+Транскрибация записи через GigaAM-v3 и (по желанию) определение говорящих —
 входная точка пакета: run().
 
 Конвейер:
@@ -42,12 +42,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def diarization_path(transcript_path) -> Path:
-    """lecture.txt -> lecture.diarization.json (рядом с транскриптом)."""
+    """recording.txt -> recording.diarization.json (рядом с транскриптом)."""
     return Path(transcript_path).with_suffix(".diarization.json")
 
 
 def words_path(transcript_path) -> Path:
-    """lecture.txt -> lecture.words.json (слова GigaAM с таймкодами)."""
+    """recording.txt -> recording.words.json (слова GigaAM с таймкодами)."""
     return Path(transcript_path).with_suffix(".words.json")
 
 
@@ -95,7 +95,7 @@ def run(audio_path, output_path=None, keep_fillers: bool = False, diarize: bool 
 
     log(f"Длительность после обрезки и склейки: {seconds_to_hhmmss(get_media_duration(audio_path))}")
 
-    with tempfile.TemporaryDirectory(prefix="lecture_") as tmp_dir:
+    with tempfile.TemporaryDirectory(prefix="recognyx_") as tmp_dir:
         wav_path = Path(tmp_dir) / "audio_16k.wav"
         log("Конвертирую аудио в WAV 16 кГц моно...")
         convert_to_wav_16k_mono(audio_path, wav_path)
