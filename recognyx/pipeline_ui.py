@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Графический интерфейс для полного конвейера обработки записи:
 fork-join (обязательный шаг) + speech-to-text через GigaAM-v3 (опциональный).
@@ -9,9 +8,9 @@ fork-join (обязательный шаг) + speech-to-text через GigaAM-v
 разработки). Qt использует собственное, значительно более зрелое управление
 окнами/модальностью, что должно снять эту категорию проблем.
 
-Использование:
-    uv sync && source .venv/bin/activate
-    python pipeline_ui.py
+Запуск (из активированного .venv или через `uv run`):
+    recognyx
+    python -m recognyx
 """
 
 import json
@@ -45,15 +44,15 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from common import ffmpeg
-from common.timecode import format_duration, hhmmss_to_seconds
-from diarization import diarize_pyannote
-from fork_join import fork_join
-from ui import media_selection
-from ui.batch_dialog import BatchDialog
-from ui.fragments_player import FragmentsPlayerDialog
-from speech_to_text_gigaam import transcribe
-from speech_to_text_gigaam.environment import (
+from recognyx.common import ffmpeg
+from recognyx.common.timecode import format_duration, hhmmss_to_seconds
+from recognyx.diarization import diarize_pyannote
+from recognyx.fork_join import fork_join
+from recognyx.ui import media_selection
+from recognyx.ui.batch_dialog import BatchDialog
+from recognyx.ui.fragments_player import FragmentsPlayerDialog
+from recognyx.speech_to_text_gigaam import transcribe
+from recognyx.speech_to_text_gigaam.environment import (
     EnvironmentCheckError,
     check_ffmpeg_compatibility,
     ensure_hf_token,

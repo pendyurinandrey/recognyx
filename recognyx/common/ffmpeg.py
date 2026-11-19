@@ -16,7 +16,7 @@ from collections import deque
 from pathlib import Path
 from typing import Callable, Optional
 
-from common.media_info import MediaInfo, parse_probe
+from recognyx.common.media_info import MediaInfo, parse_probe
 
 SILENCE_NOISE_DB = "-30dB"
 WAV_SAMPLE_RATE = 16000

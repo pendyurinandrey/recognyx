@@ -8,7 +8,7 @@ pyannote/segmentation-3.0 (нужен токен). Ничего тяжёлого
 
 import os
 
-from common.ffmpeg import FFmpegError, get_ffmpeg_major_version
+from recognyx.common.ffmpeg import FFmpegError, get_ffmpeg_major_version
 
 FFMPEG_MIN_SUPPORTED = 4
 FFMPEG_MAX_SUPPORTED = 8

@@ -8,7 +8,7 @@
 
 from typing import Optional
 
-from common.media_info import MediaInfo, audio_extension, incompatibilities
+from recognyx.common.media_info import MediaInfo, audio_extension, incompatibilities
 
 _ALL_FILES = "Все файлы (*)"
 _AUDIO_NAMES = {".m4a": "M4A", ".mp3": "MP3"}

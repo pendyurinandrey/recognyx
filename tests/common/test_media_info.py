@@ -2,7 +2,7 @@
 
 import pytest
 
-from common.media_info import MediaInfo, audio_extension, incompatibilities, parse_probe
+from recognyx.common.media_info import MediaInfo, audio_extension, incompatibilities, parse_probe
 
 
 def stream(codec_type, codec_name, **fields):

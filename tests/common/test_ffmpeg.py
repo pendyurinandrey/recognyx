@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from common import ffmpeg
+from recognyx.common import ffmpeg
 
 
 def fake_run(monkeypatch, *, returncode=0, stdout="", stderr="", raises=None):

@@ -31,14 +31,14 @@ import tempfile
 from collections import deque
 from pathlib import Path
 
-from common.ffmpeg import convert_to_wav_16k_mono, get_media_duration
-from common.timecode import seconds_to_hhmmss
-from diarization import diarize_pyannote, speaker_labels
-from speech_to_text_gigaam import transcript
-from speech_to_text_gigaam.environment import check_ffmpeg_compatibility, ensure_hf_token
+from recognyx.common.ffmpeg import convert_to_wav_16k_mono, get_media_duration
+from recognyx.common.timecode import seconds_to_hhmmss
+from recognyx.diarization import diarize_pyannote, speaker_labels
+from recognyx.speech_to_text_gigaam import transcript
+from recognyx.speech_to_text_gigaam.environment import check_ffmpeg_compatibility, ensure_hf_token
 
 MODEL_NAME = "v3_e2e_rnnt"
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def diarization_path(transcript_path) -> Path:
@@ -54,8 +54,8 @@ def words_path(transcript_path) -> Path:
 def _run_module(module: str, args: list, log) -> None:
     """Запускает `python -m module ...`, построчно передаёт вывод в log().
     Бросает RuntimeError с хвостом вывода, если процесс завершился с ошибкой."""
-    # Корень репозитория — в PYTHONPATH: editable-установка (uv sync)
-    # запоминает список пакетов на момент установки и не видит добавленных позже.
+    # Корень репозитория — в PYTHONPATH: пакет recognyx находится дочерним процессом
+    # и без установки (например, при запуске тестов из чистого окружения).
     python_path = os.pathsep.join(filter(None, [str(REPO_ROOT), os.environ.get("PYTHONPATH")]))
     env = dict(os.environ, PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8", TQDM_DISABLE="1",
                PYTHONPATH=python_path)
@@ -102,7 +102,7 @@ def run(audio_path, output_path=None, keep_fillers: bool = False, diarize: bool 
 
         if diarize:
             log("=== Определение говорящих ===")
-            _run_module("diarization.diarize_pyannote",
+            _run_module("recognyx.diarization.diarize_pyannote",
                         [wav_path, "--output", diarization_path(output_path)], log)
 
         log("=== Распознавание речи (GigaAM) ===")
@@ -110,7 +110,7 @@ def run(audio_path, output_path=None, keep_fillers: bool = False, diarize: bool 
         worker_args = [wav_path, "--output", segments_file, "--model", MODEL_NAME]
         if diarize:
             worker_args.append("--word-timestamps")
-        _run_module("speech_to_text_gigaam.worker", worker_args, log)
+        _run_module("recognyx.speech_to_text_gigaam.worker", worker_args, log)
         segments = json.loads(segments_file.read_text(encoding="utf-8"))
 
     if diarize:

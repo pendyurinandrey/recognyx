@@ -2,8 +2,8 @@
 
 import pytest
 
-from common.media_info import MediaInfo
-from ui.media_selection import (
+from recognyx.common.media_info import MediaInfo
+from recognyx.ui.media_selection import (
     audio_output_extension,
     audio_output_filter,
     audio_output_label,

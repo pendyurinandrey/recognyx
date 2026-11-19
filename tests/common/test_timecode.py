@@ -4,7 +4,7 @@ import random
 
 import pytest
 
-from common.timecode import (
+from recognyx.common.timecode import (
     format_duration,
     format_timestamp,
     hhmmss_to_seconds,

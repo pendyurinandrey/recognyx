@@ -25,7 +25,7 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
-from common.ffmpeg import (
+from recognyx.common.ffmpeg import (
     FFmpegError,
     check_ffmpeg,
     get_media_duration,
@@ -34,8 +34,8 @@ from common.ffmpeg import (
     run_ffmpeg,
     run_ffmpeg_with_progress,
 )
-from common.media_info import AUDIO_EXTENSIONS, audio_extension, incompatibilities
-from common.timecode import hhmmss_to_seconds
+from recognyx.common.media_info import AUDIO_EXTENSIONS, audio_extension, incompatibilities
+from recognyx.common.timecode import hhmmss_to_seconds
 
 MEDIA_TYPES = ("video", "audio")
 # Время в конфигурации — целые секунды, а длительность файла дробная: конец «на всю запись»

@@ -16,9 +16,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Optional
 
-from diarization import diarize_pyannote
-from speech_to_text_gigaam import transcribe
-from speech_to_text_gigaam.environment import check_ffmpeg_compatibility, ensure_hf_token
+from recognyx.diarization import diarize_pyannote
+from recognyx.speech_to_text_gigaam import transcribe
+from recognyx.speech_to_text_gigaam.environment import check_ffmpeg_compatibility, ensure_hf_token
 
 LOG_FILE_PREFIX = "recognyx-batch-"
 

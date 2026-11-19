@@ -2,7 +2,7 @@
 
 import json
 
-from diarization.speaker_labels import (
+from recognyx.diarization.speaker_labels import (
     assign_speaker,
     format_speaker,
     label_words,

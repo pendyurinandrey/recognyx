@@ -1,6 +1,6 @@
 """remove_fillers: слова-паразиты и перенос пунктуации/заглавных букв."""
 
-from common.filler_words import remove_fillers
+from recognyx.common.filler_words import remove_fillers
 
 
 def cleaned(text: str) -> list:

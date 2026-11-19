@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from diarization.diarize_pyannote import DiarizationError
-from speech_to_text_gigaam import batch
-from speech_to_text_gigaam.environment import EnvironmentCheckError
+from recognyx.diarization.diarize_pyannote import DiarizationError
+from recognyx.speech_to_text_gigaam import batch
+from recognyx.speech_to_text_gigaam.environment import EnvironmentCheckError
 
 
 class TestTranscriptPathFor:

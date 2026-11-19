@@ -9,7 +9,7 @@
 
 import bisect
 
-from common.timecode import parse_displayed_time, seconds_to_hhmmss
+from recognyx.common.timecode import parse_displayed_time, seconds_to_hhmmss
 
 
 class IntervalRangeError(ValueError):

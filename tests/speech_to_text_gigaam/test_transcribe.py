@@ -7,9 +7,9 @@ from pathlib import Path
 
 import pytest
 
-from diarization.diarize_pyannote import DiarizationError
-from speech_to_text_gigaam import transcribe
-from speech_to_text_gigaam.environment import EnvironmentCheckError
+from recognyx.diarization.diarize_pyannote import DiarizationError
+from recognyx.speech_to_text_gigaam import transcribe
+from recognyx.speech_to_text_gigaam.environment import EnvironmentCheckError
 
 PLAIN_SEGMENTS = [
     {"start": 0.0, "end": 4.0, "text": "Мы вот работаем."},
@@ -53,7 +53,7 @@ class FakePipeline:
         self.calls.append(module)
         self.modules.append((module, args))
         output = Path(args[args.index("--output") + 1])
-        if module == "diarization.diarize_pyannote":
+        if module == "recognyx.diarization.diarize_pyannote":
             output.write_text(json.dumps(TURNS), encoding="utf-8")
         else:
             if self.fail_worker:
@@ -100,7 +100,7 @@ class TestRunWithoutDiarization:
     def test_only_the_worker_runs_without_word_timestamps(self, monkeypatch, tmp_path, audio):
         fake = FakePipeline(monkeypatch, PLAIN_SEGMENTS)
         transcribe.run(audio, tmp_path / "res.txt", log=lambda m: None)
-        assert fake.calls == ["ffmpeg_check", "hf_token", "convert", "speech_to_text_gigaam.worker"]
+        assert fake.calls == ["ffmpeg_check", "hf_token", "convert", "recognyx.speech_to_text_gigaam.worker"]
         args = fake.modules[0][1]
         assert "--word-timestamps" not in args
         assert args[args.index("--model") + 1] == transcribe.MODEL_NAME
@@ -120,7 +120,7 @@ class TestRunWithoutDiarization:
         logs = []
         transcribe.run(audio, tmp_path / "res.txt", log=logs.append)
         assert "Длительность после обрезки и склейки: 01:02:05" in logs
-        assert any("вывод speech_to_text_gigaam.worker" in m for m in logs)
+        assert any("вывод recognyx.speech_to_text_gigaam.worker" in m for m in logs)
         assert logs[-1].startswith("Готово: ")
 
 
@@ -129,7 +129,7 @@ class TestRunWithDiarization:
         fake = FakePipeline(monkeypatch, WORD_SEGMENTS)
         transcribe.run(audio, tmp_path / "res.txt", diarize=True, log=lambda m: None)
         assert fake.calls == ["ffmpeg_check", "hf_token", "model_check", "convert",
-                              "diarization.diarize_pyannote", "speech_to_text_gigaam.worker"]
+                              "recognyx.diarization.diarize_pyannote", "recognyx.speech_to_text_gigaam.worker"]
         assert "--word-timestamps" in fake.modules[1][1]
 
     def test_transcript_has_speaker_labels_and_sidecar_files(self, monkeypatch, tmp_path, audio):

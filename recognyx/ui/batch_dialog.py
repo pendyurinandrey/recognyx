@@ -34,10 +34,10 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from diarization.diarize_pyannote import DiarizationError
-from speech_to_text_gigaam import batch
-from speech_to_text_gigaam.environment import EnvironmentCheckError
-from ui import media_selection
+from recognyx.diarization.diarize_pyannote import DiarizationError
+from recognyx.speech_to_text_gigaam import batch
+from recognyx.speech_to_text_gigaam.environment import EnvironmentCheckError
+from recognyx.ui import media_selection
 
 
 class BatchDialog(QDialog):

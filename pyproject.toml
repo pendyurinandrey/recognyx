@@ -16,6 +16,10 @@ dependencies = [
     "PySide6",
 ]
 
+[project.scripts]
+# Команда `recognyx` запускает графический интерфейс (то же, что `python -m recognyx`)
+recognyx = "recognyx.pipeline_ui:main"
+
 [dependency-groups]
 dev = ["pytest"]
 
@@ -23,11 +27,11 @@ dev = ["pytest"]
 gigaam = { git = "https://github.com/salute-developers/GigaAM.git" }
 
 [tool.setuptools.packages.find]
-include = ["fork_join", "common", "ui", "diarization", "speech_to_text_gigaam"]
+include = ["recognyx*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
 # importlib: тесты в разных папках могут называться одинаково (tests/common/test_x.py и
-# tests/diarization/test_x.py), а папка tests/common не затеняет пакет common
+# tests/diarization/test_x.py) и не требуют __init__.py в tests/
 addopts = ["--import-mode=importlib"]

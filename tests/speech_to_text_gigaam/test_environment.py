@@ -6,9 +6,9 @@ import types
 
 import pytest
 
-from common.ffmpeg import FFmpegError
-from speech_to_text_gigaam import environment
-from speech_to_text_gigaam.environment import EnvironmentCheckError, check_ffmpeg_compatibility, ensure_hf_token
+from recognyx.common.ffmpeg import FFmpegError
+from recognyx.speech_to_text_gigaam import environment
+from recognyx.speech_to_text_gigaam.environment import EnvironmentCheckError, check_ffmpeg_compatibility, ensure_hf_token
 
 
 @pytest.fixture(autouse=True)

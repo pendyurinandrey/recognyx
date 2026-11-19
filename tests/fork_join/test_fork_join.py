@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from common.ffmpeg import FFmpegError
-from common.media_info import MediaInfo
-from fork_join import fork_join
+from recognyx.common.ffmpeg import FFmpegError
+from recognyx.common.media_info import MediaInfo
+from recognyx.fork_join import fork_join
 
 VIDEO_INFO = MediaInfo(kind="video", audio_codec="aac", sample_rate=48000, channels=2,
                        video_codec="h264", width=1920, height=1080, pix_fmt="yuv420p", video_extradata="MD5:aaa")

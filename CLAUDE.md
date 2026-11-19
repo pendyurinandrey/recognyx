@@ -1,7 +1,9 @@
 # CLAUDE.md
 
 Правила разработки Recognyx (`recognyx`) — локального офлайн-набора для видео- и аудиозаписей
-(нарезка/склейка видео, распознавание речи, определение говорящих, GUI `pipeline_ui.py`).
+(нарезка/склейка видео, распознавание речи, определение говорящих, GUI `recognyx/pipeline_ui.py`, команда `recognyx`).
+Весь код — в пакете `recognyx/`; пути к модулям ниже указаны относительно него (`common/ffmpeg.py` =
+`recognyx/common/ffmpeg.py`). Импорты — абсолютные: `from recognyx.common import ffmpeg`.
 Описание для пользователей — в `README.md`; здесь только то, чего не видно из кода.
 
 ## Язык
@@ -38,7 +40,7 @@
 ## Тяжёлое — в отдельных процессах
 
 GUI-процесс (`pipeline_ui.py`) не считает и не держит модели. Диаризация и GigaAM запускаются
-отдельными процессами (`python -m ...` из `speech_to_text_gigaam/transcribe._run_module`): память
+отдельными процессами (`python -m recognyx....` из `speech_to_text_gigaam/transcribe._run_module`): память
 освобождается после каждого этапа. Поэтому `import gigaam`, `pyannote`, `torch` и `numpy` — только
 внутри функций (и только в процессах-исполнителях: `speech_to_text_gigaam/worker.py`,
 `diarization/diarize_pyannote.py`), а остальные модули этих пакетов на верхнем уровне тяжёлого не
@@ -58,9 +60,10 @@ GUI-процесс (`pipeline_ui.py`) не считает и не держит �
 - **Зависимости — через uv.** Список — в `pyproject.toml` (`dependencies`, группа `dev`), точные версии —
   в `uv.lock` (коммитится), версия Python — в `.python-version`. Добавлять через `uv add`, не `pip install`.
   `requires-python` — `>=3.12,<3.14`: gigaam требует onnxruntime 1.23, у которого нет сборок под 3.14.
-- **Editable-установка.** `uv sync` ставит проект editable и запоминает список пакетов на момент
-  установки; новый пакет нужно добавить в `include` в `pyproject.toml` и выполнить `uv sync --reinstall-package recognyx`. Дочерние процессы получают
-  корень репозитория в `PYTHONPATH` (`_run_module`), поэтому запуск из любой папки работает.
+- **Editable-установка.** `uv sync` ставит пакет `recognyx` editable; новые подпакеты внутри `recognyx/`
+  подхватываются сами (`include = ["recognyx*"]`), переустанавливать не нужно. Новый пакет на верхнем
+  уровне не заводить. Дочерние процессы дополнительно получают корень репозитория в `PYTHONPATH`
+  (`_run_module`), поэтому запуск из любой папки работает и без установки.
 - **Gated-модели Hugging Face.** Новую модель с условиями использования проверять в кэше ДО долгой
   работы (`check_model_available`, `local_files_only=True`) и выдавать инструкцию; описать в FAQ README.
 - **Долгие прогоны.** Полная обработка многочасовой записи (диаризация + GigaAM) занимает больше
@@ -77,9 +80,9 @@ uv run python -m pytest
 Python без GigaAM, и часть тестов молча пропустится). Тесты покрывают чистую логику и не требуют
 медиафайлов, ffmpeg и нейросетей (обёртки ffmpeg проверяются с подменой `subprocess.run`).
 Дерево тестов повторяет дерево кода: `tests/<пакет>/test_<модуль>.py`
-(например, `common/ffmpeg.py` → `tests/common/test_ffmpeg.py`). `__init__.py` в `tests/` не нужны:
+без префикса `recognyx/` (например, `recognyx/common/ffmpeg.py` → `tests/common/test_ffmpeg.py`). `__init__.py` в `tests/` не нужны:
 в `pyproject.toml` включён `--import-mode=importlib`, поэтому одинаковые имена файлов в разных
-папках допустимы, а `tests/common` не затеняет пакет `common`.
+папках допустимы.
 CI: `.github/workflows/tests.yml` гоняет `pytest` на каждый push (Python 3.12 и 3.13) через uv, ставится только
 группа `dev` (`uv sync --only-group dev`) — без GigaAM/torch. Пропущенных (`skipped`) тестов быть не должно: если тест требует тяжёлую
 зависимость, значит, тяжёлый импорт оказался не там (см. раздел выше).

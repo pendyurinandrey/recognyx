@@ -33,15 +33,15 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from common.ffmpeg import detect_silences, get_keyframe_timestamps
-from common.intervals import (
+from recognyx.common.ffmpeg import detect_silences, get_keyframe_timestamps
+from recognyx.common.intervals import (
     IntervalRangeError,
     add_left_pad,
     edit_interval,
     keep_intervals_between_silences,
     snap_intervals_to_keyframes,
 )
-from common.timecode import hhmmss_to_seconds, seconds_to_hhmmss
+from recognyx.common.timecode import hhmmss_to_seconds, seconds_to_hhmmss
 
 
 class _CenteredMessageBox(QMessageBox):

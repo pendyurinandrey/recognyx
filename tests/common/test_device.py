@@ -6,7 +6,7 @@ import types
 
 import pytest
 
-from common import device
+from recognyx.common import device
 
 
 def fake_torch(monkeypatch, cuda=False, mps=False, has_mps_backend=True):

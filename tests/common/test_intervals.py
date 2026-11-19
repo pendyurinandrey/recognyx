@@ -2,7 +2,7 @@
 
 import pytest
 
-from common.intervals import (
+from recognyx.common.intervals import (
     IntervalRangeError,
     add_left_pad,
     edit_interval,

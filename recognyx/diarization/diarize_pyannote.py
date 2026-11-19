@@ -20,7 +20,7 @@ MPS совпадает, отличается только скорость (MPS 
 torch и pyannote импортируются только внутри run().
 
 Использование:
-    uv run python -m diarization.diarize_pyannote recording.wav --output recording.diarization.json
+    uv run python -m recognyx.diarization.diarize_pyannote recording.wav --output recording.diarization.json
 """
 
 import argparse
@@ -30,8 +30,8 @@ import time
 import wave
 from pathlib import Path
 
-from common.device import pick_device, prepare_torch_environment
-from common.timecode import format_duration
+from recognyx.common.device import pick_device, prepare_torch_environment
+from recognyx.common.timecode import format_duration
 
 MODEL_ID = "pyannote/speaker-diarization-community-1"
 MODEL_URL = f"https://huggingface.co/{MODEL_ID}"

@@ -13,9 +13,9 @@ GigaAM сам расставляет пунктуацию и регистр, н�
 from itertools import groupby
 from pathlib import Path
 
-from common.filler_words import remove_fillers
-from common.timecode import format_timestamp
-from diarization import diarize_pyannote, speaker_labels
+from recognyx.common.filler_words import remove_fillers
+from recognyx.common.timecode import format_timestamp
+from recognyx.diarization import diarize_pyannote, speaker_labels
 
 SENTENCE_END_CHARS = ".?!"
 PARAGRAPH_TARGET_CHARS = 500
