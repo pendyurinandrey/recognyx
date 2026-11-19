@@ -13,8 +13,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 3.10 — минимальная поддерживаемая версия (requires-python в pyproject.toml)
-        python-version: ["3.10", "3.12"]
+        # Весь поддерживаемый диапазон (requires-python в pyproject.toml): 3.12 — основная
+        # (.python-version), 3.13 — верхняя; на 3.14 gigaam не устанавливается
+        python-version: ["3.12", "3.13"]
     steps:
       - uses: actions/checkout@v4
 

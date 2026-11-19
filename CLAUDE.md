@@ -56,14 +56,11 @@ GUI-процесс (`pipeline_ui.py`) не считает и не держит �
   Для фонового запуска использовать `subprocess.Popen(..., start_new_session=True, env=...)`, не `nohup`.
   Переменная нужна, когда системный ffmpeg версии 9+ (torchcodec поддерживает 4–8), см. FAQ в README.
 - **Зависимости — через uv.** Список — в `pyproject.toml` (`dependencies`, группа `dev`), точные версии —
-  в `uv.lock` (коммитится), версия Python — в `.python-version`. Добавлять через `uv add`, не `pip install`;
-  `requirements.txt` есть только у `speech_to_text_whisper`. `requires-python` ограничен `<3.14`:
-  gigaam требует onnxruntime 1.23, у которого нет сборок под 3.14.
+  в `uv.lock` (коммитится), версия Python — в `.python-version`. Добавлять через `uv add`, не `pip install`.
+  `requires-python` — `>=3.12,<3.14`: gigaam требует onnxruntime 1.23, у которого нет сборок под 3.14.
 - **Editable-установка.** `uv sync` ставит проект editable и запоминает список пакетов на момент
   установки; новый пакет нужно добавить в `include` в `pyproject.toml` и выполнить `uv sync --reinstall-package recognyx`. Дочерние процессы получают
   корень репозитория в `PYTHONPATH` (`_run_module`), поэтому запуск из любой папки работает.
-- **Два окружения.** `speech_to_text_whisper` и GigaAM требуют несовместимые версии `torch`;
-  `pipeline_ui` работает в корневом `.venv` только с GigaAM, whisper — в `speech_to_text_whisper/venv`.
 - **Gated-модели Hugging Face.** Новую модель с условиями использования проверять в кэше ДО долгой
   работы (`check_model_available`, `local_files_only=True`) и выдавать инструкцию; описать в FAQ README.
 - **Долгие прогоны.** Полная обработка многочасовой записи (диаризация + GigaAM) занимает больше
@@ -83,7 +80,7 @@ Python без GigaAM, и часть тестов молча пропуститс
 (например, `common/ffmpeg.py` → `tests/common/test_ffmpeg.py`). `__init__.py` в `tests/` не нужны:
 в `pyproject.toml` включён `--import-mode=importlib`, поэтому одинаковые имена файлов в разных
 папках допустимы, а `tests/common` не затеняет пакет `common`.
-CI: `.github/workflows/tests.yml` гоняет `pytest` на каждый push (Python 3.10 и 3.12) через uv, ставится только
+CI: `.github/workflows/tests.yml` гоняет `pytest` на каждый push (Python 3.12 и 3.13) через uv, ставится только
 группа `dev` (`uv sync --only-group dev`) — без GigaAM/torch. Пропущенных (`skipped`) тестов быть не должно: если тест требует тяжёлую
 зависимость, значит, тяжёлый импорт оказался не там (см. раздел выше).
 Qt-диалоги в CI не тестируются (там нет PySide6), поэтому всё, что можно проверить без Qt, выносить в чистые

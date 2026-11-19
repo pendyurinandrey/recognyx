@@ -6,11 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "recognyx"
 version = "0.1.0"
 # Верхняя граница: gigaam требует onnxruntime 1.23, а для него нет сборок под Python 3.14
-requires-python = ">=3.10,<3.14"
-# Единое окружение для pipeline_ui.py: fork_join (stdlib) + speech_to_text_gigaam и diarization
+requires-python = ">=3.12,<3.14"
+# Окружение для pipeline_ui.py: fork_join (stdlib) + speech_to_text_gigaam и diarization
 # (gigaam[longform] приносит torch и pyannote.audio) + wakepy и PySide6 для самого GUI.
-# speech_to_text_whisper сюда НЕ входит: у него несовместимая версия torch, ставится отдельно
-# (speech_to_text_whisper/requirements.txt, см. README).
 dependencies = [
     "gigaam[torch,longform]",
     "certifi",
@@ -25,7 +23,7 @@ dev = ["pytest"]
 gigaam = { git = "https://github.com/salute-developers/GigaAM.git" }
 
 [tool.setuptools.packages.find]
-include = ["fork_join", "common", "ui", "diarization", "speech_to_text_whisper", "speech_to_text_gigaam"]
+include = ["fork_join", "common", "ui", "diarization", "speech_to_text_gigaam"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
