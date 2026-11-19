@@ -48,8 +48,8 @@ from recognyx.fork_join import fork_join
 from recognyx.ui import media_selection
 from recognyx.ui.batch_dialog import BatchDialog
 from recognyx.ui.fragments_player import FragmentsPlayerDialog
-from recognyx.speech_to_text_gigaam import transcribe
-from recognyx.speech_to_text_gigaam.environment import (
+from recognyx.transcription import pipeline
+from recognyx.transcription.environment import (
     EnvironmentCheckError,
     check_ffmpeg_compatibility,
     ensure_hf_token,
@@ -657,8 +657,8 @@ class MainWindow(QWidget):
             check_paths.append(transcript_path)
         if diarize:
             check_paths += [
-                str(transcribe.diarization_path(transcript_path)),
-                str(transcribe.words_path(transcript_path)),
+                str(pipeline.diarization_path(transcript_path)),
+                str(pipeline.words_path(transcript_path)),
             ]
         existing = [p for p in check_paths if p and os.path.exists(p)]
         if existing:
@@ -703,7 +703,7 @@ class MainWindow(QWidget):
 
                 if run_speech2text:
                     t0 = time.time()
-                    transcribe.run(
+                    pipeline.run(
                         config["output"]["audioPath"],
                         transcript_path,
                         keep_fillers=not remove_fillers,

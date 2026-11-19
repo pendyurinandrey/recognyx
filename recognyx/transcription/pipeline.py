@@ -9,7 +9,7 @@
        нарезки на куски (проверено на 3ч23м: пик памяти 2.8 ГБ).
     2. Если включена диаризация: pyannote community-1 (diarization/) —
        результат сохраняется в <транскрипт>.diarization.json.
-    3. GigaAM v3_e2e_rnnt на всём WAV (worker.py). При диаризации — с точными
+    3. GigaAM v3_e2e_rnnt на всём WAV (gigaam/worker.py). При диаризации — с точными
        таймкодами слов; слова сохраняются в <транскрипт>.words.json.
     4. Итоговый TXT (transcript.py): перегруппировка по предложениям, удаление
        слов-паразитов (по желанию) и, при диаризации, метки «Спикер N» —
@@ -34,10 +34,9 @@ from pathlib import Path
 from recognyx.common.ffmpeg import convert_to_wav_16k_mono, get_media_duration
 from recognyx.common.timecode import seconds_to_hhmmss
 from recognyx.diarization import diarize_pyannote, speaker_labels
-from recognyx.speech_to_text_gigaam import transcript
-from recognyx.speech_to_text_gigaam.environment import check_ffmpeg_compatibility, ensure_hf_token
+from recognyx.transcription import gigaam, transcript
+from recognyx.transcription.environment import check_ffmpeg_compatibility, ensure_hf_token
 
-MODEL_NAME = "v3_e2e_rnnt"
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -107,17 +106,17 @@ def run(audio_path, output_path=None, keep_fillers: bool = False, diarize: bool 
 
         log("=== Распознавание речи (GigaAM) ===")
         segments_file = Path(tmp_dir) / "segments.json"
-        worker_args = [wav_path, "--output", segments_file, "--model", MODEL_NAME]
+        worker_args = [wav_path, "--output", segments_file, "--model", gigaam.MODEL_NAME]
         if diarize:
             worker_args.append("--word-timestamps")
-        _run_module("recognyx.speech_to_text_gigaam.worker", worker_args, log)
+        _run_module(gigaam.WORKER_MODULE, worker_args, log)
         segments = json.loads(segments_file.read_text(encoding="utf-8"))
 
     if diarize:
         words = sorted((w for s in segments for w in s.get("words", [])), key=lambda w: (w["start"], w["end"]))
         words_file = words_path(output_path)
         words_file.write_text(
-            json.dumps({"audio": audio_path.name, "model": MODEL_NAME, "words": words}, ensure_ascii=False, indent=1),
+            json.dumps({"audio": audio_path.name, "model": gigaam.MODEL_NAME, "words": words}, ensure_ascii=False, indent=1),
             encoding="utf-8",
         )
         log(f"Слова с таймкодами: {words_file}")
@@ -130,6 +129,6 @@ def run(audio_path, output_path=None, keep_fillers: bool = False, diarize: bool 
         paragraphs = transcript.plain_paragraphs(segments, keep_fillers, log)
         log(f"Всего абзацев после перегруппировки: {len(paragraphs)}")
 
-    transcript.write_transcript(output_path, audio_path.name, paragraphs, MODEL_NAME, keep_fillers, diarize)
+    transcript.write_transcript(output_path, audio_path.name, paragraphs, gigaam.MODEL_NAME, keep_fillers, diarize)
     log(f"Готово: {output_path}")
     return output_path

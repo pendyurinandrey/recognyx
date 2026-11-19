@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from recognyx.speech_to_text_gigaam import worker
+from recognyx.transcription.gigaam import worker
 
 
 def fake_gigaam(monkeypatch, n_segments):

@@ -4,7 +4,7 @@
 Независим от главного окна и его состояния (`MainWindow.segments` и т.п.) —
 свой список файлов, свои настройки, свои значения чекбоксов по умолчанию
 (не наследуются от главного окна). `fork_join` не используется: каждый файл
-транскрибируется целиком, без нарезки/склейки — см. speech_to_text_gigaam/batch.py.
+транскрибируется целиком, без нарезки/склейки — см. transcription/batch.py.
 
 Окно немодальное: открывается через .show(), а не .exec(). Закрытие крестиком
 во время обработки не прерывает её — фоновый поток продолжает работать, окно
@@ -35,8 +35,8 @@ from PySide6.QtWidgets import (
 )
 
 from recognyx.diarization.diarize_pyannote import DiarizationError
-from recognyx.speech_to_text_gigaam import batch
-from recognyx.speech_to_text_gigaam.environment import EnvironmentCheckError
+from recognyx.transcription import batch
+from recognyx.transcription.environment import EnvironmentCheckError
 from recognyx.ui import media_selection
 
 

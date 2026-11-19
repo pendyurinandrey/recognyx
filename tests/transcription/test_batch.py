@@ -1,13 +1,13 @@
 """Пакетная обработка: план, сортировка/дедупликация списка, оркестрация
-(`transcribe.run` подменяется — GigaAM не нужен)."""
+(`pipeline.run` подменяется — GigaAM не нужен)."""
 
 from pathlib import Path
 
 import pytest
 
 from recognyx.diarization.diarize_pyannote import DiarizationError
-from recognyx.speech_to_text_gigaam import batch
-from recognyx.speech_to_text_gigaam.environment import EnvironmentCheckError
+from recognyx.transcription import batch
+from recognyx.transcription.environment import EnvironmentCheckError
 
 
 class TestTranscriptPathFor:
@@ -136,12 +136,12 @@ class TestCheckEnvironment:
 
 
 class FakeTranscribe:
-    """Подменяет speech_to_text_gigaam.transcribe.run: пишет фиктивный файл, запоминает вызовы."""
+    """Подменяет transcription.pipeline.run: пишет фиктивный файл, запоминает вызовы."""
 
     def __init__(self, monkeypatch, fail_on=()):
         self.calls = []
         self.fail_on = set(fail_on)  # имена файлов (path.name), на которых бросить исключение
-        monkeypatch.setattr(batch, "transcribe", self)
+        monkeypatch.setattr(batch, "pipeline", self)
 
     def run(self, audio_path, output_path=None, keep_fillers=False, diarize=False, log=print):
         self.calls.append({"audio_path": Path(audio_path), "output_path": Path(output_path),
@@ -176,7 +176,7 @@ class TestRunBatch:
         batch.run_batch(items, keep_fillers=True, diarize=True, log=lambda m: None)
         assert fake.calls[0]["keep_fillers"] is True and fake.calls[0]["diarize"] is True
 
-    def test_already_done_files_are_skipped_without_calling_transcribe(self, monkeypatch, files):
+    def test_already_done_files_are_skipped_without_calling_pipeline(self, monkeypatch, files):
         files[1].with_suffix(".txt").write_text("уже готово", encoding="utf-8")
         fake = FakeTranscribe(monkeypatch)
         items = batch.plan_batch(files)

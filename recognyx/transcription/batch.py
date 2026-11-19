@@ -3,7 +3,7 @@
 
 Для папки с независимыми записями — каждый файл целиком превращается в свой
 собственный транскрипт, без нарезки и склейки (`fork_join` не используется):
-`transcribe.run()` сам достаёт звук из любого файла, видео или аудио.
+`pipeline.run()` сам достаёт звук из любого файла, видео или аудио.
 
 Обработка идёт строго последовательно (общий ресурс CPU/MPS и память). Модуль
 ничего тяжёлого не импортирует на верхнем уровне — его безопасно подключать
@@ -17,8 +17,8 @@ from pathlib import Path
 from typing import Callable, Optional
 
 from recognyx.diarization import diarize_pyannote
-from recognyx.speech_to_text_gigaam import transcribe
-from recognyx.speech_to_text_gigaam.environment import check_ffmpeg_compatibility, ensure_hf_token
+from recognyx.transcription import pipeline
+from recognyx.transcription.environment import check_ffmpeg_compatibility, ensure_hf_token
 
 LOG_FILE_PREFIX = "recognyx-batch-"
 
@@ -157,7 +157,7 @@ def run_batch(items, keep_fillers: bool, diarize: bool, log=print,
 
         log(f"=== Файл {index}/{total}: {item.path.name} ===")
         try:
-            transcribe.run(item.path, item.transcript_path, keep_fillers=keep_fillers, diarize=diarize, log=log)
+            pipeline.run(item.path, item.transcript_path, keep_fillers=keep_fillers, diarize=diarize, log=log)
             result.processed.append(item.path)
         except Exception as e:  # noqa: BLE001 - ошибка одного файла не должна ронять всю пачку
             message = str(e)

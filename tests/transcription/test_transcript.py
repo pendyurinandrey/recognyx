@@ -2,7 +2,7 @@
 
 import pytest
 
-from recognyx.speech_to_text_gigaam.transcript import (
+from recognyx.transcription.transcript import (
     group_into_sentence_paragraphs,
     plain_paragraphs,
     speaker_paragraphs,

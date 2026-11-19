@@ -1,7 +1,7 @@
 """Процесс GigaAM: распознаёт речь в WAV и сохраняет сегменты в JSON.
 
-ВНУТРЕННИЙ процесс, вручную не запускать: его запускает transcribe.py
-отдельным процессом (`python -m recognyx.speech_to_text_gigaam.worker ...`), чтобы
+ВНУТРЕННИЙ процесс, вручную не запускать: его запускает pipeline.py
+отдельным процессом (`python -m recognyx.transcription.gigaam.worker ...`), чтобы
 память, занятая моделью и VAD, освобождалась целиком по его завершении.
 
 `import gigaam` (а с ним torch) — только внутри функций: модуль можно
@@ -129,7 +129,7 @@ def transcribe_to_json(wav_path: Path, output_path: Path, model_name: str, word_
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Внутренний процесс GigaAM (запускается из transcribe.py)")
+    parser = argparse.ArgumentParser(description="Внутренний процесс GigaAM (запускается из pipeline.py)")
     parser.add_argument("wav", type=Path, help="WAV 16 кГц моно PCM16")
     parser.add_argument("--output", type=Path, required=True, help="Куда сохранить сегменты (JSON)")
     parser.add_argument("--model", required=True, help="Имя модели GigaAM, например v3_e2e_rnnt")
