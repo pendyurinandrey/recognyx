@@ -245,9 +245,9 @@ class MainWindow(QWidget):
 
         layout.addWidget(output_group)
 
-        # -------------------------------------------------- speech-to-text
+        # -------------------------------------------------- распознавание речи
 
-        s2t_group = QGroupBox("Speech-to-text (GigaAM)")
+        s2t_group = QGroupBox("Распознавание речи (GigaAM)")
         s2t_layout = QGridLayout(s2t_group)
 
         self.speech2text_check = QCheckBox("Выполнить распознавание речи (GigaAM)")
@@ -638,7 +638,7 @@ class MainWindow(QWidget):
             if not transcript_path:
                 QMessageBox.critical(
                     self, "Транскрипция",
-                    "Укажите путь к файлу транскрипции или отключите шаг Speech-to-text.",
+                    "Укажите путь к файлу транскрипции или отключите распознавание речи.",
                 )
                 return
             try:
@@ -710,7 +710,7 @@ class MainWindow(QWidget):
                         diarize=diarize,
                         log=log,
                     )
-                    log(f"Speech-to-text завершён за {format_duration(time.time() - t0)}.")
+                    log(f"Распознавание речи завершено за {format_duration(time.time() - t0)}.")
 
             self.done_signal.emit()
         except (assembly.ConfigError, ffmpeg.FFmpegError, EnvironmentCheckError,
