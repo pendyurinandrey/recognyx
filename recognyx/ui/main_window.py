@@ -77,6 +77,7 @@ class FragmentDialog(QDialog):
         layout.addWidget(self.end_edit, 1, 1)
 
         buttons = QHBoxLayout()
+        layout.addLayout(buttons, 2, 0, 1, 2)
         buttons.addStretch()
         cancel_btn = QPushButton("Отмена")
         cancel_btn.clicked.connect(self.reject)
@@ -85,7 +86,6 @@ class FragmentDialog(QDialog):
         ok_btn.setDefault(True)
         ok_btn.clicked.connect(self._on_ok)
         buttons.addWidget(ok_btn)
-        layout.addLayout(buttons, 2, 0, 1, 2)
 
         self.start_edit.setFocus()
         self.start_edit.selectAll()
@@ -194,6 +194,7 @@ class MainWindow(QWidget):
         layout.addWidget(self.tree, stretch=1)
 
         tree_buttons = QHBoxLayout()
+        layout.addLayout(tree_buttons)
         add_seg_btn = QPushButton("Добавить видео/аудио")
         add_seg_btn.clicked.connect(self._add_segment)
         tree_buttons.addWidget(add_seg_btn)
@@ -214,7 +215,6 @@ class MainWindow(QWidget):
         down_btn.clicked.connect(lambda: self._move_selected(1))
         tree_buttons.addWidget(down_btn)
         tree_buttons.addStretch()
-        layout.addLayout(tree_buttons)
 
         output_group = QGroupBox("Результат нарезки и склейки")
         output_layout = QGridLayout(output_group)
@@ -283,6 +283,7 @@ class MainWindow(QWidget):
         layout.addWidget(self.keep_awake_check)
 
         action_buttons = QHBoxLayout()
+        layout.addLayout(action_buttons)
         action_buttons.addStretch()
         self.run_button = QPushButton("Запустить")
         self.run_button.setDefault(True)
@@ -291,7 +292,6 @@ class MainWindow(QWidget):
         self.run_button.clicked.connect(self._run)
         action_buttons.addWidget(self.run_button)
         action_buttons.addStretch()
-        layout.addLayout(action_buttons)
 
         self.progress = QProgressBar()
         self.progress.setRange(0, 1)

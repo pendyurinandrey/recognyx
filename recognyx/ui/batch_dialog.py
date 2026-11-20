@@ -74,6 +74,7 @@ class BatchDialog(QDialog):
         layout.addWidget(self.file_list, stretch=1)
 
         list_buttons = QHBoxLayout()
+        layout.addLayout(list_buttons)
         self.add_button = QPushButton("Добавить файлы")
         self.add_button.clicked.connect(self._add_files)
         list_buttons.addWidget(self.add_button)
@@ -87,7 +88,6 @@ class BatchDialog(QDialog):
         delete_btn.clicked.connect(self._delete_selected)
         list_buttons.addWidget(delete_btn)
         list_buttons.addStretch()
-        layout.addLayout(list_buttons)
 
         self.remove_fillers_check = QCheckBox("Убирать слова-паразиты (вот, ну и т.п.)")
         self.remove_fillers_check.setChecked(True)
@@ -105,6 +105,7 @@ class BatchDialog(QDialog):
         layout.addWidget(self.keep_awake_check)
 
         run_buttons = QHBoxLayout()
+        layout.addLayout(run_buttons)
         run_buttons.addStretch()
         self.run_button = QPushButton("Запустить пакетную обработку")
         self.run_button.clicked.connect(self._start)
@@ -114,7 +115,6 @@ class BatchDialog(QDialog):
         self.stop_button.clicked.connect(self._stop)
         run_buttons.addWidget(self.stop_button)
         run_buttons.addStretch()
-        layout.addLayout(run_buttons)
 
         self.progress_label = QLabel("")
         layout.addWidget(self.progress_label)

@@ -292,6 +292,7 @@ class FragmentsPlayerDialog(QDialog):
         layout.addWidget(self.screen_widget, stretch=1)
 
         controls = QHBoxLayout()
+        layout.addLayout(controls)
         self.play_button = QPushButton("▶")
         self.play_button.clicked.connect(self._toggle_play)
         controls.addWidget(self.play_button)
@@ -304,7 +305,6 @@ class FragmentsPlayerDialog(QDialog):
         controls.addStretch()
         self.position_label = QLabel(f"00:00:00 / {seconds_to_hhmmss(self.duration)}")
         controls.addWidget(self.position_label)
-        layout.addLayout(controls)
 
         self.position_slider = QSlider(Qt.Orientation.Horizontal)
         self.position_slider.setRange(0, int(self.duration * 1000))
@@ -335,6 +335,7 @@ class FragmentsPlayerDialog(QDialog):
         layout.addWidget(self.fragment_list)
 
         numeric_row = QHBoxLayout()
+        layout.addLayout(numeric_row)
         numeric_row.addWidget(QLabel("Начало (ЧЧ:ММ:СС):"))
         self.start_edit = QLineEdit()
         self.start_edit.setMinimumWidth(90)
@@ -359,7 +360,6 @@ class FragmentsPlayerDialog(QDialog):
         )
         self.merge_button.clicked.connect(self._on_merge_fragments)
         numeric_row.addWidget(self.merge_button)
-        layout.addLayout(numeric_row)
 
         detect_group = QGroupBox("Автоопределение пауз")
         detect_layout = QGridLayout(detect_group)
@@ -395,6 +395,7 @@ class FragmentsPlayerDialog(QDialog):
         layout.addWidget(detect_group)
 
         buttons = QHBoxLayout()
+        layout.addLayout(buttons)
         buttons.addStretch()
         cancel_btn = QPushButton("Отмена")
         cancel_btn.clicked.connect(self.reject)
@@ -403,7 +404,6 @@ class FragmentsPlayerDialog(QDialog):
         ok_btn.setDefault(True)
         ok_btn.clicked.connect(self._on_ok)
         buttons.addWidget(ok_btn)
-        layout.addLayout(buttons)
 
         self.media_player.positionChanged.connect(self._on_player_position_changed)
         self.media_player.playbackStateChanged.connect(self._on_playback_state_changed)
